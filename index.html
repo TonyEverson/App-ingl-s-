@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APA English Learning</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
+        .app-container { background: white; width: 100%; max-width: 500px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: #1a73e8; color: white; padding: 20px; text-align: center; }
+        .content { padding: 20px; text-align: center; }
+        .lesson-img { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; margin-bottom: 20px; }
+        .phrase-en { font-size: 1.5rem; font-weight: bold; color: #333; margin-bottom: 10px; }
+        .phrase-pt { font-size: 1.1rem; color: #666; margin-bottom: 30px; }
+        .controls button { border: none; padding: 15px 25px; border-radius: 50px; cursor: pointer; font-size: 1rem; margin: 5px; transition: 0.3s; }
+        .btn-listen { background: #34a853; color: white; }
+        .btn-speak { background: #ea4335; color: white; }
+        .status { margin-top: 20px; font-weight: bold; min-height: 24px; }
+        .feedback-success { color: #34a853; }
+        .feedback-error { color: #ea4335; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header">
+        <h1>APA English App</h1>
+        <p>Tema: Café da Manhã (Cotidiano)</p>
+    </div>
+
+    <div class="content">
+        <img src="https://images.unsplash.com/photo-1525351484163-7529414344d8?w=500" alt="Breakfast" class="lesson-img" id="lesson-image">
+        
+        <div class="phrase-en" id="text-en">I drink coffee every morning.</div>
+        <div class="phrase-pt" id="text-pt">Eu bebo café toda manhã.</div>
+
+        <div class="controls">
+            <button class="btn-listen" onclick="speakPhrase()">🔊 Ouvir IA</button>
+            <button class="btn-speak" onclick="startRecognition()">🎤 Repetir Frase</button>
+        </div>
+
+        <div id="status" class="status">Clique em "Ouvir" para começar!</div>
+    </div>
+</div>
+
+<script>
+    const phrase = "I drink coffee every morning";
+    const statusDisplay = document.getElementById('status');
+
+    // Função para a IA falar (Texto para Voz)
+    function speakPhrase() {
+        const utterance = new SpeechSynthesisUtterance(phrase);
+        utterance.lang = 'en-US';
+        utterance.rate = 0.9;
+        window.speechSynthesis.speak(utterance);
+        statusDisplay.innerText = "Ouça atentamente...";
+        statusDisplay.className = "status";
+    }
+
+    // Função para Reconhecimento de Voz (Aluno falando)
+    function startRecognition() {
+        const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        
+        if (!Recognition) {
+            alert("Seu navegador não suporta reconhecimento de voz. Tente o Chrome.");
+            return;
+        }
+
+        const recognition = new Recognition();
+        recognition.lang = 'en-US';
+
+        statusDisplay.innerText = "Pode falar agora...";
+        recognition.start();
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript.toLowerCase();
+            const original = phrase.toLowerCase().replace(/[.]/g, "");
+
+            if (transcript.includes(original) || original.includes(transcript)) {
+                statusDisplay.innerText = "Excelente! Pronúncia correta. 🎉";
+                statusDisplay.className = "status feedback-success";
+            } else {
+                statusDisplay.innerText = `Você disse: "${transcript}". Tente de novo!`;
+                statusDisplay.className = "status feedback-error";
+            }
+        };
+
+        recognition.onerror = () => {
+            statusDisplay.innerText = "Erro ao capturar áudio. Verifique o microfone.";
+        };
+    }
+</script>
+
+</body>
+</html>
